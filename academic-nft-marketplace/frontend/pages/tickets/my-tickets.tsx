@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Layout from '../../src/components/Layout/Layout';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { CalendarIcon, MapPinIcon, QrCodeIcon, TicketIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
 
 interface UserTicket {
   id: string;
@@ -73,15 +74,25 @@ const MyTicketsPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Simulate API call
-      setTimeout(() => {
-        setTickets(sampleTickets);
-        setLoading(false);
-      }, 1000);
+      fetchUserTickets();
     } else {
       setLoading(false);
     }
   }, [isAuthenticated]);
+
+  const fetchUserTickets = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/api/tickets/user');
+      setTickets(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user tickets:', error);
+      // Fallback to sample data if API fails
+      setTickets(sampleTickets);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -125,20 +125,7 @@ const DashboardPage: React.FC = () => {
   const fetchDashboardStats = async () => {
     try {
       const response = await userAPI.getDashboardStats();
-      // Enhance stats with gamification data
-      const enhancedStats = {
-        ...response.data,
-        level: response.data.level || Math.floor((response.data.totalAchievements || 0) / 3) + 1,
-        xp: response.data.xp || (response.data.totalAchievements || 0) * 150 + (response.data.verifiedAchievements || 0) * 300,
-        totalXP: response.data.totalXP || Math.floor(((response.data.totalAchievements || 0) / 3) + 1) * 1000,
-        streakDays: response.data.streakDays || Math.floor(Math.random() * 30) + 1,
-        rank: response.data.rank || (response.data.verifiedAchievements >= 10 ? 'Legendary' : response.data.verifiedAchievements >= 5 ? 'Epic' : 'Rising Star'),
-        battlePassLevel: response.data.battlePassLevel || Math.floor((response.data.totalAchievements || 0) / 2) + 1,
-        skillPoints: response.data.skillPoints || (response.data.totalAchievements || 0) * 10,
-        rareAchievements: response.data.rareAchievements || Math.floor((response.data.verifiedAchievements || 0) * 0.3),
-        legendaryAchievements: response.data.legendaryAchievements || Math.floor((response.data.verifiedAchievements || 0) * 0.1)
-      };
-      setStats(enhancedStats);
+      setStats(response.data);
     } catch (error) {
       console.error('Failed to fetch dashboard stats:', error);
       // Provide fallback stats for demo
@@ -151,7 +138,7 @@ const DashboardPage: React.FC = () => {
         xp: 2400,
         totalXP: 5000,
         streakDays: 15,
-        rank: 'Epic',
+        rank: 'Epic Scholar',
         battlePassLevel: 7,
         skillPoints: 120,
         rareAchievements: 3,

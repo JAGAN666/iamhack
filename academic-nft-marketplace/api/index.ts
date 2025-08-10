@@ -44,6 +44,18 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
       return handleLogin(req, res);
     }
 
+    if (url === '/api/users/dashboard-stats') {
+      return handleDashboardStats(req, res);
+    }
+
+    if (url === '/api/achievements/user') {
+      return handleUserAchievements(req, res);
+    }
+
+    if (url === '/api/nfts/user') {
+      return handleUserNFTs(req, res);
+    }
+
     // Default 404 for unmatched routes
     return res.status(404).json({ error: 'API endpoint not found' });
     
@@ -328,11 +340,166 @@ function handleLogin(req: VercelRequest, res: VercelResponse) {
         firstName: 'John',
         lastName: 'Demo',
         university: 'Eastern Michigan University',
-        role: 'student'
+        role: 'student',
+        emailVerified: true  // Demo user should be verified
       },
       token: 'demo-token-12345'
     });
   }
 
   return res.status(404).json({ error: 'User not found. Try: demo@student.edu' });
+}
+
+function handleDashboardStats(req: VercelRequest, res: VercelResponse) {
+  // Return comprehensive dashboard stats for demo user
+  const demoStats = {
+    totalAchievements: 12,
+    verifiedAchievements: 8,
+    mintedNFTs: 5,
+    unlockedOpportunities: 23,
+    level: 5,
+    xp: 2400,
+    totalXP: 5000,
+    streakDays: 15,
+    rank: 'Epic Scholar',
+    battlePassLevel: 7,
+    skillPoints: 120,
+    rareAchievements: 3,
+    legendaryAchievements: 1
+  };
+
+  return res.json(demoStats);
+}
+
+function handleUserAchievements(req: VercelRequest, res: VercelResponse) {
+  // Return sample user achievements
+  const userAchievements = [
+    {
+      id: '1',
+      title: 'Dean\'s List Recognition',
+      description: 'Achieved Dean\'s List status with 3.8 GPA in Computer Science',
+      type: 'academic',
+      category: 'GPA',
+      date: '2024-12-15',
+      status: 'verified',
+      proofUrl: '/achievements/deans-list.pdf',
+      nftMinted: true,
+      nftTokenId: 'nft_001',
+      verifiedBy: 'Eastern Michigan University',
+      verificationDate: '2024-12-20',
+      skillTags: ['Academic Excellence', 'Computer Science', 'Mathematics'],
+      confidenceScore: 0.98
+    },
+    {
+      id: '2', 
+      title: 'Research Publication',
+      description: 'Co-authored paper on Machine Learning in Academic Systems',
+      type: 'research',
+      category: 'Publication',
+      date: '2024-11-10',
+      status: 'verified',
+      proofUrl: '/achievements/research-paper.pdf',
+      nftMinted: true,
+      nftTokenId: 'nft_002',
+      verifiedBy: 'IEEE Conference',
+      verificationDate: '2024-11-15',
+      skillTags: ['Research', 'Machine Learning', 'Academic Writing'],
+      confidenceScore: 0.96
+    },
+    {
+      id: '3',
+      title: 'Student Government President',
+      description: 'Elected as Student Government President for 2024-2025 term',
+      type: 'leadership',
+      category: 'Leadership Role',
+      date: '2024-09-01',
+      status: 'verified',
+      proofUrl: '/achievements/president-certificate.pdf',
+      nftMinted: true,
+      nftTokenId: 'nft_003',
+      verifiedBy: 'Student Affairs Office',
+      verificationDate: '2024-09-05',
+      skillTags: ['Leadership', 'Public Speaking', 'Event Management'],
+      confidenceScore: 1.0
+    }
+  ];
+
+  return res.json(userAchievements);
+}
+
+function handleUserNFTs(req: VercelRequest, res: VercelResponse) {
+  // Return sample user NFTs
+  const userNFTs = [
+    {
+      id: 'nft_001',
+      tokenId: '1',
+      name: 'GPA Guardian',
+      description: 'Elite academic performance NFT - Dean\'s List Recognition',
+      type: 'gpa_guardian',
+      rarity: 'Epic',
+      level: 3,
+      experience: 2400,
+      attributes: {
+        gpa: 3.8,
+        university: 'Eastern Michigan University',
+        achievement: 'Dean\'s List',
+        semester: 'Fall 2024'
+      },
+      imageUrl: '/nfts/gpa-guardian.png',
+      animationUrl: '/nfts/gpa-guardian.mp4',
+      createdAt: '2024-12-20',
+      lastEvolved: '2024-12-20',
+      stakingRewards: 150,
+      marketValue: 0.15,
+      achievements: ['Dean\'s List Q4 2024']
+    },
+    {
+      id: 'nft_002',
+      tokenId: '2', 
+      name: 'Research Rockstar',
+      description: 'Research excellence NFT - Published IEEE Paper',
+      type: 'research_rockstar',
+      rarity: 'Legendary',
+      level: 5,
+      experience: 3500,
+      attributes: {
+        publications: 1,
+        citations: 8,
+        field: 'Machine Learning',
+        journal: 'IEEE Conference'
+      },
+      imageUrl: '/nfts/research-rockstar.png',
+      animationUrl: '/nfts/research-rockstar.mp4',
+      createdAt: '2024-11-15',
+      lastEvolved: '2024-11-20',
+      stakingRewards: 250,
+      marketValue: 0.35,
+      achievements: ['First Publication', 'IEEE Recognition']
+    },
+    {
+      id: 'nft_003',
+      tokenId: '3',
+      name: 'Leadership Legend',
+      description: 'Leadership mastery NFT - Student Government President',
+      type: 'leadership_legend',
+      rarity: 'Epic',
+      level: 4,
+      experience: 3000,
+      attributes: {
+        role: 'President',
+        organization: 'Student Government',
+        duration: '1 Year',
+        impact: 'University-wide'
+      },
+      imageUrl: '/nfts/leadership-legend.png',
+      animationUrl: '/nfts/leadership-legend.mp4',
+      createdAt: '2024-09-05',
+      lastEvolved: '2024-10-15',
+      stakingRewards: 200,
+      marketValue: 0.25,
+      achievements: ['Elected President', 'Policy Changes']
+    }
+  ];
+
+  return res.json(userNFTs);
 }

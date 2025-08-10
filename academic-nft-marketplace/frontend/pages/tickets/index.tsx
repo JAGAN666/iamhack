@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Layout from '../../src/components/Layout/Layout';
 import { CalendarIcon, MapPinIcon, UserGroupIcon, TagIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
 
 interface Event {
   id: string;
@@ -105,12 +106,22 @@ const TicketsPage: React.FC = () => {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setEvents(sampleEvents);
-      setLoading(false);
-    }, 1000);
+    fetchEvents();
   }, []);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/api/events');
+      setEvents(response.data);
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+      // Fallback to sample data if API fails
+      setEvents(sampleEvents);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredEvents = filter === 'all' 
     ? events 

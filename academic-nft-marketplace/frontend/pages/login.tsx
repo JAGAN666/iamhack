@@ -8,6 +8,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const { login } = useAuth();
   const router = useRouter();
@@ -15,12 +16,13 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       await login(email, password);
       router.push('/dashboard');
-    } catch (error) {
-      // Error handled by AuthContext
+    } catch (error: any) {
+      setError(error.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -28,14 +30,15 @@ const LoginPage: React.FC = () => {
 
   const handleDemoLogin = async () => {
     setLoading(true);
+    setError('');
     setEmail('demo@student.edu');
     setPassword('demo123');
     
     try {
       await login('demo@student.edu', 'demo123');
       router.push('/dashboard');
-    } catch (error) {
-      // Error handled by AuthContext
+    } catch (error: any) {
+      setError(error.message || 'Demo login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -59,6 +62,21 @@ const LoginPage: React.FC = () => {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="rounded-md bg-red-50 p-4">
+                  <div className="flex">
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">
+                        Login Error
+                      </h3>
+                      <div className="mt-2 text-sm text-red-700">
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email Address
