@@ -78,8 +78,7 @@ const nextConfig = {
     scrollRestoration: true,
   },
 
-  // Output configuration for static export
-  output: 'standalone',
+  // Optimized for Vercel serverless
   
   // Disable x-powered-by header
   poweredByHeader: false,
