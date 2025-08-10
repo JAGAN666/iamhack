@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "/",
+    "NEXT_PUBLIC_EMAILJS_SERVICE_ID": "@emailjs_service_id",
+    "NEXT_PUBLIC_EMAILJS_TEMPLATE_ID": "@emailjs_template_id",
+    "NEXT_PUBLIC_EMAILJS_PUBLIC_KEY": "@emailjs_public_key",
+    "NEXT_PUBLIC_POLYGON_RPC_URL": "@polygon_rpc_url",
+    "DATABASE_URL": "@database_url",
+    "JWT_SECRET": "@jwt_secret",
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 15
+    }
+  }
+}

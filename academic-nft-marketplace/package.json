@@ -1,0 +1,37 @@
+{
+  "name": "academic-nft-marketplace",
+  "version": "1.0.0",
+  "description": "Cross-University Academic Achievement Marketplace",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm run dev",
+    "build": "npm run backend:build && npm run frontend:build",
+    "backend:build": "cd backend && npm run build",
+    "frontend:build": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../contracts && npm install",
+    "build:production": "./build-production.sh",
+    "deploy:production": "./scripts/deploy-production.sh",
+    "test": "npm run backend:test && npm run frontend:test && npm run contracts:test",
+    "backend:test": "cd backend && npm test",
+    "frontend:test": "cd frontend && npm test",
+    "contracts:test": "cd contracts && npm test",
+    "contracts:compile": "cd contracts && npm run compile",
+    "contracts:deploy:local": "cd contracts && npm run deploy:local",
+    "contracts:deploy:mumbai": "cd contracts && npm run deploy:mumbai",
+    "db:generate": "cd backend && npx prisma generate",
+    "db:push": "cd backend && npx prisma db push",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:studio": "cd backend && npx prisma studio",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "clean": "rm -rf backend/dist frontend/.next contracts/artifacts contracts/cache",
+    "lint": "npm run backend:lint && npm run frontend:lint",
+    "backend:lint": "cd backend && npm run lint",
+    "frontend:lint": "cd frontend && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

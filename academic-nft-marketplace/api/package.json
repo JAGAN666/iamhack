@@ -1,0 +1,12 @@
+{
+  "name": "academic-nft-api",
+  "version": "1.0.0",
+  "description": "Serverless API for Academic NFT Marketplace",
+  "main": "index.ts",
+  "dependencies": {
+    "@prisma/client": "^5.7.1",
+    "@vercel/node": "^3.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
