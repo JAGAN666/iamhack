@@ -349,9 +349,9 @@ class PerformanceMonitor {
 
   // Cleanup observers
   destroy() {
-    for (const [name, observer] of this.observers) {
+    this.observers.forEach((observer, name) => {
       observer.disconnect();
-    }
+    });
     this.observers.clear();
     this.metrics = [];
   }
