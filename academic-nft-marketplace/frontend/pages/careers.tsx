@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../src/contexts/AuthContext';
 import Layout from '../src/components/Layout/Layout';
-import CareerMatchmaking from '../src/components/AI/CareerMatchmaking';
+// import CareerMatchmaking from '../src/components/AI/CareerMatchmaking'; // TODO: Create this component
 import { motion } from 'framer-motion';
 import {
   SparklesIcon,
@@ -79,7 +79,11 @@ const CareersPage: React.FC = () => {
           </motion.div>
 
           {/* Career Matchmaking Component */}
-          <CareerMatchmaking />
+          {/* <CareerMatchmaking /> TODO: Create this component */}
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Career Matchmaking</h3>
+            <p className="text-gray-600">Coming Soon - AI-powered career matching based on your achievements and NFTs.</p>
+          </div>
         </div>
       </div>
     </Layout>
