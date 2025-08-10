@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "npm install --legacy-peer-deps && npm run build",
+    "vercel-build": "npm install --legacy-peer-deps --include=dev && npm run build",
     "start": "next start",
     "lint": "next lint",
     "export": "next export"
