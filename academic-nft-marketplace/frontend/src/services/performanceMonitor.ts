@@ -241,9 +241,9 @@ class PerformanceMonitor {
       largestContentfulPaint: lcpEntry?.value || 0,
       cumulativeLayoutShift: clsEntry?.value || 0,
       firstInputDelay: fidEntry?.value || 0,
-      timeToInteractive: navigation.domInteractive - navigation.navigationStart,
+      timeToInteractive: navigation.domInteractive - (navigation.fetchStart || 0),
       totalPageSize: resources.reduce((total, resource: any) => total + (resource.transferSize || 0), 0),
-      loadTime: navigation.loadEventEnd - navigation.navigationStart,
+      loadTime: navigation.loadEventEnd - (navigation.fetchStart || 0),
       resourceCount: resources.length
     };
   }
