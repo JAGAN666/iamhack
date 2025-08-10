@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../src/contexts/AuthContext';
 import Layout from '../src/components/Layout/Layout';
-import UniversityComparison from '../src/components/Analytics/UniversityComparison';
+// import UniversityComparison from '../src/components/Analytics/UniversityComparison'; // TODO: Create this component
 import { motion } from 'framer-motion';
 import {
   ChartBarIcon,
@@ -79,7 +79,11 @@ const UniversitiesPage: React.FC = () => {
           </motion.div>
 
           {/* University Comparison Component */}
-          <UniversityComparison />
+          {/* <UniversityComparison /> TODO: Create this component */}
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">University Comparison</h3>
+            <p className="text-gray-600">Coming Soon - Compare your achievements with students from different universities.</p>
+          </div>
         </div>
       </div>
     </Layout>
