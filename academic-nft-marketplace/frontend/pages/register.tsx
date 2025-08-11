@@ -15,6 +15,8 @@ const universities = [
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
+    password: '',
+    confirmPassword: '',
     universityEmail: '',
     firstName: '',
     lastName: '',
@@ -22,19 +24,42 @@ const RegisterPage: React.FC = () => {
     studentId: ''
   });
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const { register } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError('');
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+
+    // Validate password strength
+    if (formData.password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await register(formData);
-      router.push('/dashboard');
+      const result = await register(formData);
+      
+      if (result.needsVerification) {
+        // Redirect to email verification page
+        router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
+      } else {
+        // Direct login success (shouldn't happen with Supabase, but handle it)
+        router.push('/dashboard');
+      }
     } catch (error) {
-      // Error handled by AuthContext
+      // Error handled by AuthContext and shown via UI
+      console.error('Registration failed:', error);
     } finally {
       setLoading(false);
     }
@@ -148,6 +173,41 @@ const RegisterPage: React.FC = () => {
                   className="input-field mt-1"
                   placeholder="your.personal@email.com"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="input-field mt-1"
+                  placeholder="Enter secure password"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="input-field mt-1"
+                  placeholder="Confirm your password"
+                />
+                {passwordError && (
+                  <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+                )}
               </div>
 
               <div>

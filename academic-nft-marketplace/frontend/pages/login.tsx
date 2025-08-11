@@ -22,7 +22,12 @@ const LoginPage: React.FC = () => {
       await login(email, password);
       router.push('/dashboard');
     } catch (error: any) {
-      setError(error.message || 'Login failed. Please try again.');
+      if (error.message.includes('Email verification required')) {
+        // Redirect to verification page
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      } else {
+        setError(error.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

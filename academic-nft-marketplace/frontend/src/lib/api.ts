@@ -45,6 +45,9 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (data: any) => api.post('/auth/register', data),
   login: (data: any) => api.post('/auth/login', data),
+  verifyOtp: (data: { email: string; token: string; type?: string }) => api.post('/auth/verify-otp', data),
+  resendOtp: (data: { email: string; type?: string }) => api.post('/auth/resend-otp', data),
+  // Legacy endpoints for backward compatibility
   verifyEmail: (token: string) => api.post('/auth/verify-email', { token }),
   resendVerification: (email: string) => api.post('/auth/resend-verification', { email }),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),

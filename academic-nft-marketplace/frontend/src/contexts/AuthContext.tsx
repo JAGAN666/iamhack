@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authAPI } from '../lib/api';
+import { supabaseAuth } from '../lib/supabase';
 
 interface User {
   id: string;
@@ -15,10 +16,11 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
+  pendingVerification: string | null; // Email pending verification
   login: (email: string, password?: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (userData: any) => Promise<{ needsVerification: boolean; email: string }>;
   logout: () => void;
-  verifyEmail: (token: string) => Promise<void>;
+  verifyEmail: (email: string, token: string) => Promise<void>;
   resendVerification: (email: string) => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -42,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pendingVerification, setPendingVerification] = useState<string | null>(null);
 
   useEffect(() => {
     // Only access localStorage on client-side to prevent hydration mismatch
@@ -49,6 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Check for existing auth on mount
       const storedToken = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
+      const storedPendingVerification = localStorage.getItem('pendingVerification');
 
       if (storedToken && storedUser) {
         try {
@@ -60,6 +64,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.removeItem('user');
         }
       }
+
+      if (storedPendingVerification) {
+        setPendingVerification(storedPendingVerification);
+      }
     }
 
     setLoading(false);
@@ -69,18 +77,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       const response = await authAPI.login({ email, password });
-      const { token: newToken, user: newUser } = response.data;
+      const { token: newToken, user: newUser, needsVerification } = response.data;
+
+      if (needsVerification) {
+        // User needs to verify email first
+        setPendingVerification(email);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pendingVerification', email);
+        }
+        throw new Error('Email verification required. Please check your email and verify your account.');
+      }
 
       setToken(newToken);
       setUser(newUser);
+      setPendingVerification(null);
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', newToken);
         localStorage.setItem('user', JSON.stringify(newUser));
+        localStorage.removeItem('pendingVerification');
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      throw new Error(error.response?.data?.error || 'Login failed');
+      throw new Error(error.response?.data?.error || error.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -90,9 +109,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       const response = await authAPI.register(userData);
+      const { needsVerification, email } = response.data;
       
-      // Registration successful, but user needs to verify email
-      return response.data;
+      if (needsVerification) {
+        setPendingVerification(email);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pendingVerification', email);
+        }
+      }
+
+      return { needsVerification: needsVerification || false, email: email || userData.email };
     } catch (error: any) {
       console.error('Registration error:', error);
       throw new Error(error.response?.data?.error || 'Registration failed');
@@ -104,24 +130,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setPendingVerification(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('pendingVerification');
     }
   };
 
-  const verifyEmail = async (verificationToken: string) => {
+  const verifyEmail = async (email: string, verificationToken: string) => {
     try {
       setLoading(true);
-      const response = await authAPI.verifyEmail(verificationToken);
+      const response = await authAPI.verifyOtp({ email, token: verificationToken });
       const { token: newToken, user: newUser } = response.data;
 
       setToken(newToken);
       setUser(newUser);
+      setPendingVerification(null);
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', newToken);
         localStorage.setItem('user', JSON.stringify(newUser));
+        localStorage.removeItem('pendingVerification');
       }
     } catch (error: any) {
       console.error('Email verification error:', error);
@@ -133,7 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resendVerification = async (email: string) => {
     try {
-      await authAPI.resendVerification(email);
+      await authAPI.resendOtp({ email });
     } catch (error: any) {
       console.error('Resend verification error:', error);
       throw new Error(error.response?.data?.error || 'Failed to resend verification');
@@ -144,6 +174,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     token,
     loading,
+    pendingVerification,
     login,
     register,
     logout,
