@@ -157,7 +157,7 @@ export function createLazyComponent<T extends ComponentType<any>>(
           />
         }
       >
-        <LazyComponent {...props} ref={ref} />
+        <LazyComponent {...(props as any)} {...(ref ? { ref } : {})} />
       </Suspense>
     </LazyLoadErrorBoundary>
   ));
