@@ -1,15 +1,18 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Supabase configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Supabase configuration with fallbacks for deployment
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
 
-// Create Supabase client
+// Check if we have real Supabase credentials
+const hasSupabaseConfig = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-anon-key';
+
+// Create Supabase client with fallback configuration
 export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
+    autoRefreshToken: hasSupabaseConfig,
+    persistSession: hasSupabaseConfig,
+    detectSessionInUrl: hasSupabaseConfig
   }
 });
 
@@ -79,6 +82,9 @@ export const supabaseAuth = {
     universityEmail?: string;
     studentId?: string;
   }) {
+    if (!hasSupabaseConfig) {
+      throw new Error('Supabase is not configured. Please use demo authentication.');
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -100,6 +106,9 @@ export const supabaseAuth = {
 
   // Sign in with email and password
   async signIn(email: string, password: string) {
+    if (!hasSupabaseConfig) {
+      throw new Error('Supabase is not configured. Please use demo authentication.');
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
