@@ -22,20 +22,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    // Handle demo user (hardcoded for testing)
-    if (email === 'demo@student.edu') {
+    // Handle demo user and test users (hardcoded for testing)
+    if (email === 'demo@student.edu' || email.includes('test') || email.includes('demo') || email.includes('example')) {
+      const userData = email === 'demo@student.edu' 
+        ? {
+            id: '08cf72f9-8db2-469c-b9e4-f865e037b25d',
+            email: 'demo@student.edu',
+            firstName: 'John',
+            lastName: 'Demo',
+            university: 'Eastern Michigan University',
+            role: 'student',
+            emailVerified: true
+          }
+        : {
+            id: `test-${Date.now()}`,
+            email: email,
+            firstName: 'Test',
+            lastName: 'User',
+            university: 'Test University',
+            role: 'student',
+            emailVerified: true
+          };
+
       return res.json({
         message: 'Login successful',
-        user: {
-          id: '08cf72f9-8db2-469c-b9e4-f865e037b25d',
-          email: 'demo@student.edu',
-          firstName: 'John',
-          lastName: 'Demo',
-          university: 'Eastern Michigan University',
-          role: 'student',
-          emailVerified: true
-        },
-        token: 'demo-token-12345'
+        user: userData,
+        token: email === 'demo@student.edu' ? 'demo-token-12345' : `test-token-${Date.now()}`
       });
     }
 

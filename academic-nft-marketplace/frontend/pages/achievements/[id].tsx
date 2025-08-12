@@ -282,7 +282,7 @@ const AchievementDetailPage: React.FC = () => {
                       Awaiting Verification
                     </h3>
                     <p className="text-sm text-gray-500">
-                      Your achievement is being reviewed. You'll be able to mint an NFT once it's verified.
+                      Your achievement is being reviewed. You&apos;ll be able to mint an NFT once it&apos;s verified.
                     </p>
                   </div>
                 ) : hasNFT ? (

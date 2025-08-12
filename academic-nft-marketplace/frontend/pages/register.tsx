@@ -25,6 +25,7 @@ const RegisterPage: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const { register } = useAuth();
   const router = useRouter();
@@ -32,6 +33,7 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError('');
+    setSubmitError('');
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
@@ -48,18 +50,21 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
 
     try {
+      console.log('📝 Starting registration for:', formData.email);
       const result = await register(formData);
       
       if (result.needsVerification) {
+        console.log('📧 Registration requires verification, redirecting...');
         // Redirect to email verification page
         router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
       } else {
-        // Direct login success (shouldn't happen with Supabase, but handle it)
+        console.log('✅ Registration complete, redirecting to dashboard...');
+        // Direct login success (demo users)
         router.push('/dashboard');
       }
-    } catch (error) {
-      // Error handled by AuthContext and shown via UI
-      console.error('Registration failed:', error);
+    } catch (error: any) {
+      console.error('❌ Registration failed:', error);
+      setSubmitError(error.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -90,6 +95,21 @@ const RegisterPage: React.FC = () => {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit}>
+              {submitError && (
+                <div className="rounded-md bg-red-50 p-4">
+                  <div className="flex">
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">
+                        Registration Error
+                      </h3>
+                      <div className="mt-2 text-sm text-red-700">
+                        <p>{submitError}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">

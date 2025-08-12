@@ -9,8 +9,9 @@ async function getUserFromAuth(req: NextApiRequest): Promise<any> {
 
   const token = authHeader.split(' ')[1];
   
-  // Check if it's the demo token
-  if (token === 'demo-token-12345') {
+  // Check if it's a demo or test token (dynamic support)
+  if (token.startsWith('demo-token') || token.startsWith('test-token') || token === 'demo-token-12345') {
+    console.log('🎭 Demo/test token detected, returning demo user');
     return {
       id: '56ce2ca9-248a-480a-b8ce-e8f7a38e69b9',
       email: 'demo@student.edu',

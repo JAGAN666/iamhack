@@ -112,23 +112,31 @@ const DashboardPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
+    // Only redirect if auth has finished loading and there's no user
+    if (!authLoading && !user && mounted) {
+      console.log('🔒 No authenticated user, redirecting to login');
+      router.replace('/login');
       return;
     }
 
-    if (user) {
+    // Only fetch stats if we have a user and are mounted
+    if (user && mounted) {
+      console.log('👤 User authenticated, fetching dashboard stats:', user.email);
       fetchDashboardStats();
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, mounted]);
 
   const fetchDashboardStats = async () => {
     try {
+      console.log('📊 Fetching dashboard stats for user:', user?.email);
       const response = await userAPI.getDashboardStats();
+      console.log('✅ Dashboard stats fetched successfully');
       setStats(response.data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard stats:', error);
-      // Provide fallback stats for demo
+    } catch (error: any) {
+      console.warn('⚠️ Dashboard stats API failed, using fallback data:', error.message);
+      
+      // Don't redirect on dashboard stats failure - just use fallback data
+      // This prevents users from being stuck in redirect loops
       setStats({
         totalAchievements: 12,
         verifiedAchievements: 8,
@@ -144,6 +152,8 @@ const DashboardPage: React.FC = () => {
         rareAchievements: 3,
         legendaryAchievements: 1
       });
+      
+      console.log('📊 Using demo dashboard stats - user can still access dashboard');
     } finally {
       setLoading(false);
     }

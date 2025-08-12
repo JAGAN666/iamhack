@@ -112,18 +112,35 @@ export class OfflineStorageService {
 
   // Initialize app settings
   async initializeSettings(): Promise<AppSettings> {
-    let settings = await db.settings.get(1);
-    if (!settings) {
-      settings = {
+    try {
+      let settings = await db.settings.get(1);
+      if (!settings) {
+        console.log('🔧 Initializing app settings for first time');
+        settings = {
+          id: 1,
+          offlineMode: false,
+          notifications: true,
+          darkMode: false,
+          language: 'en'
+        };
+        // Use put instead of add to avoid constraint errors
+        await db.settings.put(settings);
+        console.log('✅ App settings initialized successfully');
+      } else {
+        console.log('📋 Using existing app settings');
+      }
+      return settings;
+    } catch (error) {
+      console.error('❌ Error initializing settings:', error);
+      // Return default settings if IndexedDB fails
+      return {
         id: 1,
         offlineMode: false,
         notifications: true,
         darkMode: false,
         language: 'en'
       };
-      await db.settings.add(settings);
     }
-    return settings;
   }
 
   // Cache user data

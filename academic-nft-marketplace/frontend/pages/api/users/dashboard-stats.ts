@@ -3,14 +3,19 @@ import { NextApiRequest, NextApiResponse } from 'next';
 // Helper function to get user from authorization header
 async function getUserFromAuth(req: NextApiRequest): Promise<any> {
   const authHeader = req.headers.authorization;
+  console.log('🔍 Dashboard stats - checking auth header:', authHeader ? 'Bearer token present' : 'No auth header');
+  
   if (!authHeader?.startsWith('Bearer ')) {
+    console.error('❌ No valid authorization token provided');
     throw new Error('No valid authorization token provided');
   }
 
   const token = authHeader.split(' ')[1];
+  console.log('🔑 Token received:', token.substring(0, 20) + '...');
   
-  // Check if it's the demo token
-  if (token === 'demo-token-12345') {
+  // Check if it's any demo/test token (dynamic or static)
+  if (token.startsWith('demo-token') || token.startsWith('test-token') || token === 'demo-token-12345') {
+    console.log('🎭 Demo/test token detected, returning demo user');
     return {
       id: '56ce2ca9-248a-480a-b8ce-e8f7a38e69b9',
       email: 'demo@student.edu',
@@ -22,17 +27,29 @@ async function getUserFromAuth(req: NextApiRequest): Promise<any> {
     };
   }
 
-  // For now, return a basic user object for Supabase tokens
-  // In production, this would verify the JWT token with Supabase
-  return {
-    id: 'supabase-user-id',
-    email: 'user@example.com',
-    firstName: 'New',
-    lastName: 'User',
-    university: 'University',
-    role: 'student',
-    emailVerified: true
-  };
+  // For Supabase JWT tokens, extract user info (simplified for demo)
+  if (token.length > 50 && token.includes('.')) {
+    console.log('🔐 Supabase JWT token detected');
+    try {
+      // In production, verify JWT with Supabase
+      // For now, return a basic authenticated user
+      return {
+        id: 'supabase-user-id',
+        email: 'user@example.com',
+        firstName: 'New',
+        lastName: 'User',
+        university: 'University',
+        role: 'student',
+        emailVerified: true
+      };
+    } catch (error) {
+      console.error('❌ Error validating Supabase token:', error);
+      throw new Error('Invalid Supabase token');
+    }
+  }
+
+  console.error('❌ Unrecognized token format');
+  throw new Error('Invalid token format');
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

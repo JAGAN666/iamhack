@@ -46,19 +46,62 @@ export const PWAProvider: React.FC<PWAProviderProps> = ({ children }) => {
   // Initialize PWA context
   useEffect(() => {
     const initialize = async () => {
-      // Initialize offline storage
-      const initialSettings = await offlineStorage.initializeSettings();
-      setSettings(initialSettings);
-      setIsOfflineMode(initialSettings.offlineMode);
+      try {
+        console.log('🚀 Initializing PWA context...');
+        
+        // Initialize offline storage with error handling
+        const initialSettings = await offlineStorage.initializeSettings();
+        setSettings(initialSettings);
+        setIsOfflineMode(initialSettings.offlineMode);
+        console.log('✅ PWA settings initialized');
 
-      // Get initial cache stats
-      const stats = await offlineStorage.getCacheStats();
-      setCacheStats(stats);
+        // Get initial cache stats with error handling
+        try {
+          const stats = await offlineStorage.getCacheStats();
+          setCacheStats(stats);
+          console.log('📊 Cache stats loaded');
+        } catch (statsError) {
+          console.warn('⚠️ Could not load cache stats:', statsError);
+          // Use default cache stats
+          setCacheStats({
+            users: 0,
+            nfts: 0,
+            opportunities: 0,
+            achievements: 0,
+            pendingSync: 0,
+            lastSync: new Date()
+          });
+        }
 
-      // Check if app is installed
-      if (window.matchMedia('(display-mode: standalone)').matches || 
-          (window.navigator as any).standalone) {
-        setIsInstalled(true);
+        // Check if app is installed
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            (window.navigator as any).standalone) {
+          setIsInstalled(true);
+        }
+        
+        console.log('🎉 PWA context initialization complete');
+      } catch (error) {
+        console.error('❌ PWA context initialization failed:', error);
+        
+        // Set fallback values to prevent app crash
+        setSettings({
+          id: 1,
+          offlineMode: false,
+          notifications: true,
+          darkMode: false,
+          language: 'en'
+        });
+        setIsOfflineMode(false);
+        setCacheStats({
+          users: 0,
+          nfts: 0,
+          opportunities: 0,
+          achievements: 0,
+          pendingSync: 0,
+          lastSync: new Date()
+        });
+        
+        console.log('🔧 PWA context initialized with fallback values');
       }
     };
 

@@ -31,11 +31,17 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('🚨 API Error:', error.response?.status, error.response?.data);
+    
     if (error.response?.status === 401 && typeof window !== 'undefined') {
+      console.log('🔒 Unauthorized access - clearing auth and redirecting to login');
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/auth/login';
+      localStorage.removeItem('pendingVerification');
+      
+      // Redirect to correct login page
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

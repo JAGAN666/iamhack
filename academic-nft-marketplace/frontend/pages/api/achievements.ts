@@ -44,9 +44,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).end();
   }
 
-  if (req.method !== 'GET') {
+  if (req.method === 'GET') {
+    return handleGetAchievements(req, res);
+  } else if (req.method === 'POST') {
+    return handleCreateAchievement(req, res);
+  } else {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+}
+
+async function handleGetAchievements(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const user = await getUserFromAuth(req);
@@ -201,6 +208,96 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error) {
     console.error('Achievements API error:', error);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+}
+
+async function handleCreateAchievement(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const user = await getUserFromAuth(req);
+    
+    // For this demo, we'll simulate file upload and achievement creation
+    // In production, this would integrate with Supabase storage and database
+    
+    let achievementData;
+    
+    // Handle multipart form data or JSON
+    if (req.headers['content-type']?.includes('multipart/form-data')) {
+      // In a real implementation, you'd use a library like multer or formidable
+      // For now, we'll extract JSON data from the request
+      achievementData = {
+        title: 'New Achievement',
+        description: 'User submitted achievement',
+        category: 'User Submitted',
+        type: 'academic'
+      };
+    } else {
+      achievementData = JSON.parse(req.body.data || '{}');
+    }
+    
+    // Generate a new achievement ID
+    const newAchievementId = `ach-${Date.now()}`;
+    
+    // Create new achievement object
+    const newAchievement = {
+      id: newAchievementId,
+      title: achievementData.title || 'New Achievement',
+      description: achievementData.description || 'User submitted achievement',
+      type: achievementData.type || 'academic',
+      category: achievementData.category || 'User Submitted',
+      date_achieved: new Date().toISOString().split('T')[0],
+      status: 'pending', // New achievements start as pending verification
+      proof_url: '/api/placeholder/user-upload.pdf',
+      nft_minted: false,
+      verified_by: null,
+      verification_date: null,
+      skill_tags: achievementData.metadata?.skillsGained || ['User Skills'],
+      confidence_score: 0.75,
+      rarity: 'Common',
+      level: 1,
+      user_id: user.id,
+      course_name: achievementData.courseName,
+      grade: achievementData.grade,
+      year: achievementData.year,
+      university: achievementData.university || user.university,
+      tags: achievementData.tags || [],
+      verification_method: achievementData.verificationMethod,
+      difficulty: achievementData.metadata?.difficulty,
+      created_at: new Date().toISOString()
+    };
+    
+    // In production, this would:
+    // 1. Save files to Supabase Storage
+    // 2. Insert achievement into database
+    // 3. Trigger verification workflow
+    // 4. Send notifications
+    
+    console.log('New achievement created:', newAchievement);
+    
+    // Simulate WebSocket broadcast for real-time updates
+    // In production, this would emit to all connected clients via Socket.IO
+    console.log('Broadcasting achievement update to WebSocket clients:', {
+      type: 'new-achievement',
+      data: {
+        id: newAchievementId,
+        title: newAchievement.title,
+        type: newAchievement.type,
+        userFirstName: user.firstName,
+        university: newAchievement.university,
+        timestamp: newAchievement.created_at,
+        verified: false
+      }
+    });
+    
+    return res.status(201).json({
+      success: true,
+      message: 'Achievement uploaded successfully!',
+      id: newAchievementId,
+      achievement: newAchievement
+    });
+    
+  } catch (error) {
+    console.error('Create achievement error:', error);
     return res.status(401).json({ error: 'Unauthorized' });
   }
 }

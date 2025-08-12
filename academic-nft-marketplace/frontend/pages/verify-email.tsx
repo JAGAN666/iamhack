@@ -57,15 +57,20 @@ const VerifyEmailPage: React.FC = () => {
     setSuccess('');
 
     try {
+      console.log('📧 Starting verification process for:', email);
       await verifyEmail(email, otpCode);
-      setSuccess('Email verified successfully! Redirecting to dashboard...');
       
-      // Redirect to dashboard after 2 seconds
+      setSuccess('Email verified successfully! Redirecting to dashboard...');
+      console.log('✅ Email verification successful, redirecting...');
+      
+      // Use router.replace to avoid "Page Not Found" issues
       setTimeout(() => {
-        router.push('/dashboard');
-      }, 2000);
+        console.log('🔄 Redirecting to dashboard...');
+        router.replace('/dashboard');
+      }, 1500);
       
     } catch (error: any) {
+      console.error('❌ Verification failed:', error.message);
       setError(error.message || 'Verification failed');
     } finally {
       setLoading(false);

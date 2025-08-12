@@ -79,8 +79,8 @@ const Custom404: React.FC = () => {
                 Oops! Page Not Found
               </h2>
               <p className="text-slate-300 text-lg leading-relaxed">
-                The page you're looking for seems to have wandered off into the blockchain. 
-                Don't worry, let's get you back on track!
+                The page you&apos;re looking for seems to have wandered off into the blockchain. 
+                Don&apos;t worry, let&apos;s get you back on track!
               </p>
             </motion.div>
 
